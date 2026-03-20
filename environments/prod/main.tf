@@ -1,4 +1,5 @@
 module "prod_network" {
-  source   = "../../modules/networking"
-  vpc_name = "BTO-VPC"
+  source      = "../../modules/networking"
+  project     = "bto"
+  environment = "prod"
 }
