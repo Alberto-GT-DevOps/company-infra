@@ -1,0 +1,45 @@
+name: "Terraform CI/CD"
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: environments/prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -var-file="terraform.tfvars"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
+
+      - name: Terraform Apply
+        if: github.event.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -var-file="terraform.tfvars"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
+
