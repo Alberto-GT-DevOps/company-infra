@@ -1,9 +1,19 @@
+locals {
+  name_prefix = "${var.project}-${var.environment}"
+
+  common_tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
+}
+
 resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr
 
-  tags = {
-    Name = var.vpc_name
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-vpc"
+  })
 }
 
 data "aws_availability_zones" "available" {
