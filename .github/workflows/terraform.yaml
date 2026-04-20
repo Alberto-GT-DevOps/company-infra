@@ -56,7 +56,7 @@ jobs:
 
       - name: Terraform Plan
         if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-        run: terraform plan -no-color -input-false
+        run: terraform plan -no-color -input=false
 
       - name: Terraform Action
         if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
