@@ -51,6 +51,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
 
-      - name: Terraform Apply
-        if: github.event.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+      - name: Terraform Action
+        if: github.event.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+        run: |
+          ACTION=${{ github.event.inputs.terraform_action || 'apply' }} 
+          echo "Executing: terraform $ACTION"
+          terraform $ACTION -auto-approve -input=false
