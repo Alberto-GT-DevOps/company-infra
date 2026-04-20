@@ -4,6 +4,17 @@ on:
   pull_request:
   push:
     branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      terraform_action:
+        description: 'Action (Apply or destroy)'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
 
 jobs:
   terraform:
