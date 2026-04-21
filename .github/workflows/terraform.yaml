@@ -59,7 +59,7 @@ jobs:
         run: terraform plan -no-color -input=false
 
       - name: Terraform Action
-        if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           ACTION=${{ github.event.inputs.terraform_action || 'apply' }} 
           echo "Executing: terraform $ACTION"
