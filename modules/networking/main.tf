@@ -34,9 +34,9 @@ resource "aws_subnet" "public_subnets" {
   cidr_block        = element(var.public_subnet_cidrs, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
-  tags = {
-    Name = "Public Subnet ${count.index + 1}"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-${count.index + 1}"
+  })
 }
 
 resource "aws_subnet" "private_subnets" {
