@@ -81,7 +81,7 @@ resource "aws_route_table_association" "public_assoc" {
 }
 
 resource "aws_eip" "nat" {
-  domain = vpc
+  domain = "vpc"
   tags = local.common_tags
 }
 
