@@ -19,6 +19,8 @@ module "eks" {
   # Authentication (Modern API mode)
   enable_cluster_creator_admin_permissions = true
 
+  enable_irsa = true
+
   # Managed node group (simple baseline)
   eks_managed_node_groups = {
     default = {
@@ -26,6 +28,12 @@ module "eks" {
       min_size       = 1
       max_size       = 3
       desired_size   = 2
+    }
+  }
+
+  cluster_addons = {
+    aws-ebs-csi-driver = {
+      most_recent = true
     }
   }
 
