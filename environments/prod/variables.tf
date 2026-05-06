@@ -4,11 +4,11 @@ variable "aws_region" {
 }
 
 variable "project" {
-  type = string
+  type    = string
   default = "bto"
 }
 
 variable "environment" {
-  type = string
+  type    = string
   default = "prod"
 }
