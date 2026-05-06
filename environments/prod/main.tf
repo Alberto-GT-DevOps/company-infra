@@ -32,7 +32,7 @@ module "eks" {
 resource "aws_eks_addon" "ebs_csi" {
   cluster_name             = module.eks.cluster_name
   addon_name               = "aws-ebs-csi-driver"
-  addon_version            = "v1.30-0-eksbuild.1"
+  addon_version            = "v1.30.0-eksbuild.1"
   service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
 
   depends_on = [module.eks]
