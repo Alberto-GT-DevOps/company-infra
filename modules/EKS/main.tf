@@ -9,7 +9,6 @@ module "eks" {
   cluster_name    = "${local.name_prefix}-eks"
   cluster_version = var.cluster_version
 
-  cluster_addons = var.cluster_addons
   access_entries = var.access_entries
   enable_irsa    = var.enable_irsa
 

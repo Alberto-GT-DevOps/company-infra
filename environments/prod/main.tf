@@ -15,13 +15,6 @@ module "eks" {
   private_subnet_ids = module.prod_network.private_subnet_ids
   public_subnet_ids  = module.prod_network.public_subnet_ids
 
-  cluster_addons = {
-    aws-ebs-csi-driver = {
-      most_recent              = true
-      service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
-    }
-  }
-
   access_entries = {
     admin_user = {
       principal_arn     = "arn:aws:iam::045306125645:user/terraform"
@@ -34,6 +27,15 @@ module "eks" {
     }
   }
 
+}
+
+resource "aws_eks_addon" "ebs_csi" {
+  cluster_name = module.eks.cluster_name
+  addon_name = "aws-ebs-csi-driver"
+  addon_version = "v1.30-0-eksbuild.1"
+  service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
+
+  depends_on = [ module.eks ]
 }
 
 module "ebs_csi_irsa_role" {
