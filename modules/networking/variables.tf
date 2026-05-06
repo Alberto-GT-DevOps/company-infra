@@ -3,8 +3,13 @@ variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }
 
-variable "project" {}
-variable "environment" {}
+variable "project" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
 
 variable "public_subnet_cidrs" {
   type        = list(string)

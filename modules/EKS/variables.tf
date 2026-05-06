@@ -23,11 +23,6 @@ variable "cluster_version" {
   default = "1.32"
 }
 
-variable "cluster_addons" {
-  type    = any
-  default = {}
-}
-
 variable "access_entries" {
   type    = any
   default = {}
