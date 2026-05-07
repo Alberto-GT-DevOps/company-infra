@@ -35,6 +35,8 @@ resource "aws_eks_addon" "ebs_csi" {
   addon_version            = "v1.30.0-eksbuild.1"
   service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
 
+  resolve_conflicts_on_update = "OVERWRITE"
+
   depends_on = [module.eks]
 }
 
