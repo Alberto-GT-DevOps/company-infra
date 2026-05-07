@@ -42,7 +42,7 @@ module "ebs_csi_irsa_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.0"
 
-  role_name_prefix      = "${var.project}-${var.environment}-ebs-csi"
+  role_name     = "${var.project}-${var.environment}-ebs-csi"
   attach_ebs_csi_policy = true
 
   oidc_providers = {
@@ -51,4 +51,31 @@ module "ebs_csi_irsa_role" {
       namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
     }
   }
+}
+
+resource "helm_release" "aws_lbc" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
+
+  # Crucial: This ensures the EKS cluster and the IAM role exist first
+  depends_on = [
+    module.eks,
+    module.lbc_irsa_role
+  ]
+
+  set = [ {
+    name  = "clusterName"
+    value = module.eks.cluster_name
+  },
+  {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  },
+  {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.lbc_irsa_role.iam_role_arn
+  }
+  ]
 }
