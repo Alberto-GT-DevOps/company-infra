@@ -59,7 +59,6 @@ resource "helm_release" "aws_lbc" {
   chart      = "aws-load-balancer-controller"
   namespace  = "kube-system"
 
-  # Crucial: This ensures the EKS cluster and the IAM role exist first
   depends_on = [
     module.eks,
     module.lbc_irsa_role
