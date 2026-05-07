@@ -24,6 +24,6 @@ module "lbc_irsa_role" {
   }
 
   role_policy_arns = {
-    aws_iam_policy.load_balancer_controller.arn
+    load_balancer_controller = aws_iam_policy.load_balancer_controller.arn
   }
 }

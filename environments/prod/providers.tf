@@ -10,8 +10,15 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.95.0, < 6.0"
     }
+
+    http = {
+      source = "hashicorp/http"
+      version = "~> 3.0"
+    }
   }
 }
+
+
 
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
