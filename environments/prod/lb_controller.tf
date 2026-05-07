@@ -12,6 +12,7 @@ resource "aws_iam_policy" "load_balancer_controller" {
 
 module "lbc_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.0"
 
   role_name = "${var.project}-${var.environment}-lbc-role"
 
