@@ -28,7 +28,7 @@ jobs:
         working-directory: environments/prod
     steps:
       - name: Checkout
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
