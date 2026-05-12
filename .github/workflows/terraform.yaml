@@ -20,13 +20,59 @@ permissions:
   contents: read
 
 jobs:
-  terraform-deploy:
+  terraform-plan:
     runs-on: ubuntu-latest
 
     defaults:
       run:
         working-directory: environments/prod
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@4
 
+      - name: Configure AWS Credentials
+        uses:
+          role-to-assume: arn:aws:iam::045306125645:role/github-actions-role
+          aws-region: us-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+      
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Upload Plan
+        id: plan
+        run: |
+          # handle the plan logic for both apply and destroy
+          ACTION=${{ github.event.inputs.terraform_action || 'apply' }}
+          if [ "$ACTION" == "destroy"]; then
+            terraform plan -destroy -input=false -out=tfplan
+          else
+            terraform plan -input=false -out=tfplan
+          fi
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifac@v4
+        with: 
+          name: tf-plan-file
+          path: environment/prod/tfplan
+
+
+  terraform-apply:
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    defaults:
+      run:
+        working-directory: environment/prod
     env:
       #AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY }}
       #AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
@@ -45,22 +91,19 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-   #   - name: Terraform format
-   #     run: terraform fmt -check
+      - name: Terraform format
+        run: terraform fmt -check
 
       - name: Terraform Init
         run: terraform init
     
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-        run: terraform plan -no-color -input=false
-
+      - name: Download Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tf-plan-file
+          path: environment/prod
+      
       - name: Terraform Action
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
-          ACTION=${{ github.event.inputs.terraform_action || 'apply' }} 
-          echo "Executing: terraform $ACTION"
-          terraform $ACTION -auto-approve -input=false
+          echo "Executing: terraform apply tfplan"
+          terraform apply -auto-approve -input=false tfplan

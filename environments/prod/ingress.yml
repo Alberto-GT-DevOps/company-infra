@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    # 1. Tells the controller to spin up an ALB
+    kubernetes.io/ingress.class: alb
+    # 2. Makes it public (internet) vs internal
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    # 3. Routes traffic directly to Pod IPs (High Performance)
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
