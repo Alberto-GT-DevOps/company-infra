@@ -28,10 +28,11 @@ jobs:
         working-directory: environments/prod
     steps:
       - name: Checkout
-      - uses: actions/checkout@4
+        uses: actions/checkout@4
 
       - name: Configure AWS Credentials
-        uses:
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
           role-to-assume: arn:aws:iam::045306125645:role/github-actions-role
           aws-region: us-west-2
 
@@ -45,10 +46,6 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -input=false -out=tfplan
-
-      - name: Upload Plan
-        id: plan
         run: |
           # handle the plan logic for both apply and destroy
           ACTION=${{ github.event.inputs.terraform_action || 'apply' }}
@@ -59,7 +56,7 @@ jobs:
           fi
 
       - name: Upload Plan Artifact
-        uses: actions/upload-artifac@v4
+        uses: actions/upload-artifact@v4
         with: 
           name: tf-plan-file
           path: environment/prod/tfplan
