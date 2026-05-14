@@ -1,11 +1,11 @@
-module "prod_network" {
+module "networking" {
   source      = "../../modules/networking"
   project     = var.project
   environment = var.environment
 }
 
 module "eks" {
-  source      = "../../modules/EKS"
+  source      = "../../modules/eks"
   project     = var.project
   environment = var.environment
 
@@ -29,54 +29,29 @@ module "eks" {
 
 }
 
-resource "aws_eks_addon" "ebs_csi" {
-  cluster_name             = module.eks.cluster_name
-  addon_name               = "aws-ebs-csi-driver"
-  addon_version            = "v1.30.0-eksbuild.1"
-  service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
+module "ebs_csi" {
+  source            = "../../modules/addons/ebs-csi"
+  cluster_name      = module.eks.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
 
-  resolve_conflicts_on_update = "OVERWRITE"
+  project     = var.project
+  environment = var.environment
+  depends_on  = [module.eks]
+}
+
+module "aws_load_balancer_controller" {
+  source = "../../modules/addons/aws-load-balancer-controller"
+
+  cluster_name      = module.eks.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+
+  project     = var.project
+  environment = var.environment
+  depends_on  = [module.eks]
+}
+
+module "metrics_server" {
+  source = "../../modules/addons/metrics-server"
 
   depends_on = [module.eks]
-}
-
-module "ebs_csi_irsa_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.0"
-
-  role_name     = "${var.project}-${var.environment}-ebs-csi"
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-}
-
-resource "helm_release" "aws_lbc" {
-  name       = "aws-load-balancer-controller"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-load-balancer-controller"
-  namespace  = "kube-system"
-
-  depends_on = [
-    module.eks,
-    module.lbc_irsa_role
-  ]
-
-  set = [ {
-    name  = "clusterName"
-    value = module.eks.cluster_name
-  },
-  {
-    name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
-  },
-  {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.lbc_irsa_role.iam_role_arn
-  }
-  ]
 }
