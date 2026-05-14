@@ -6,8 +6,8 @@ resource "helm_release" "metrics_server" {
   chart      = "metrics-server"
   version    = "3.12.2"
 
-  set = {
+  set = [{
     name  = "args[0]"
     value = "--kubelet-insecure-tls"
-  }
+  }]
 }
