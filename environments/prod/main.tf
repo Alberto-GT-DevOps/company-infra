@@ -11,9 +11,9 @@ module "eks" {
 
   enable_irsa = true
 
-  vpc_id             = module.prod_network.vpc_id
-  private_subnet_ids = module.prod_network.private_subnet_ids
-  public_subnet_ids  = module.prod_network.public_subnet_ids
+  vpc_id             = module.networking.vpc_id
+  private_subnet_ids = module.networking.private_subnet_ids
+  public_subnet_ids  = module.networking.public_subnet_ids
 
   access_entries = {
     admin_user = {
