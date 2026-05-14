@@ -5,13 +5,12 @@ resource "helm_release" "aws_lbc" {
   namespace  = "kube-system"
 
   depends_on = [
-    module.eks,
     module.lbc_irsa_role
   ]
 
   set = [{
     name  = "clusterName"
-    value = var.eks.cluster_name
+    value = var.cluster_name
     },
     {
       name  = "serviceAccount.name"
