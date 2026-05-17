@@ -69,8 +69,8 @@ module "metrics_server" {
 module "argocd" {
   source = "../../modules/addons/argocd"
 
-  project = var.project
+  project     = var.project
   environment = var.environment
 
-  depends_on = [ module.eks ]
+  depends_on = [module.eks]
 }
