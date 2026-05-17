@@ -50,6 +50,16 @@ module "aws_load_balancer_controller" {
   depends_on  = [module.eks]
 }
 
+module "external_secrets_operator" {
+  source = "../../modules/addons/external-secrets-operator"
+
+  oidc_provider_arn = module.eks.oidc_provider_arn
+
+  project     = var.project
+  environment = var.environment
+  depends_on  = [module.eks]
+}
+
 module "metrics_server" {
   source = "../../modules/addons/metrics-server"
 
