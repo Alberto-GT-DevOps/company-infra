@@ -49,7 +49,7 @@ jobs:
         run: |
           # handle the plan logic for both apply and destroy
           ACTION=${{ github.event.inputs.terraform_action || 'apply' }}
-          if [ "$ACTION" == "destroy"]; then
+          if [ "$ACTION" == "destroy" ]; then
             terraform plan -destroy -input=false -out=tfplan
           else
             terraform plan -input=false -out=tfplan
