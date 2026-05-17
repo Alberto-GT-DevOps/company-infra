@@ -57,7 +57,10 @@ module "external_secrets_operator" {
 
   project     = var.project
   environment = var.environment
-  depends_on  = [module.eks]
+  depends_on  = [
+    module.eks,
+    module.aws_load_balancer_controller
+  ]
 }
 
 module "metrics_server" {
